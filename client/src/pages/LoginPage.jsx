@@ -24,7 +24,7 @@ export default function LoginPage() {
 
       // Save token
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("role_id", JSON.stringify(data.user.role_id));
 
       // Role-based navigation
       switch (data.user.role_id) {
