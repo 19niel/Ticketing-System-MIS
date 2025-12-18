@@ -1,19 +1,13 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-export default function ProtectedRoute({ allowedRoles }) {
+export default function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
-  const role = Number(localStorage.getItem("role"));
+  const roleId = localStorage.getItem("role_id");
 
-  // Not logged in
-  if (!token) {
-    return <Navigate to="/" replace />;
-  }
+  // 🔍 TEST LOGS
+  console.log("JWT Token:", token);
+  console.log("Role ID:", roleId);
 
-  // Role-based access (optional)
-  if (allowedRoles && !allowedRoles.includes(role)) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Allowed → show the page
-  return <Outlet />;
+  // Temporary: allow access even if missing (for testing)
+  return children;
 }
