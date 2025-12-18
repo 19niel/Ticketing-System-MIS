@@ -50,11 +50,21 @@ export default function Header({ role = "admin", username = "Admin User", initia
                 <button className="w-full text-left px-4 py-2 hover:bg-gray-100">Settings</button>
                 <hr className="border-gray-200" />
                 <button
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-                  onClick={() => navigate("/")}
-                >
-                  <LogOut className="w-4 h-4" /> Log out
-                </button>
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                onClick={() => {
+                  // 1. Remove token / authentication
+                  localStorage.removeItem("token"); // or clear your auth context if you use one
+
+                  // 2. Close menu
+                  setMenuOpen(false);
+
+                  // 3. Redirect to login page and replace history
+                  navigate("/", { replace: true });
+                }}
+              >
+                <LogOut className="w-4 h-4" /> Log out
+              </button>
+
               </div>
             )}
           </div>
