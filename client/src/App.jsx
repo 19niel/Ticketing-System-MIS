@@ -8,42 +8,35 @@ import PublicRoute from "./utils/PublicRoute";
 
 export default function App() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        }
-      />
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
 
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute allowedRoles={[1]}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/techsupport"
-        element={
-          <ProtectedRoute allowedRoles={[2]}>
-            <TechSupportDashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/techsupport"
+          element={
+            <ProtectedRoute>
+              <TechSupportDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/employee"
-        element={
-          <ProtectedRoute allowedRoles={[3]}>
-            <EmployeeDashboard />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+        <Route
+          path="/employee"
+          element={
+            <ProtectedRoute>
+              <EmployeeDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
   );
 }
