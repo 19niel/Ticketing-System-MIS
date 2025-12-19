@@ -9,7 +9,6 @@ import PublicRoute from "./utils/PublicRoute";
 export default function App() {
   return (
     <Routes>
-      {/* Login Page - Public Route */}
       <Route
         path="/"
         element={
@@ -19,31 +18,28 @@ export default function App() {
         }
       />
 
-      {/* Admin Dashboard */}
       <Route
         path="/admin"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[1]}>
             <AdminDashboard />
           </ProtectedRoute>
         }
       />
 
-      {/* Tech Support Dashboard */}
       <Route
         path="/techsupport"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[2]}>
             <TechSupportDashboard />
           </ProtectedRoute>
         }
       />
 
-      {/* Employee Dashboard */}
       <Route
         path="/employee"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[3]}>
             <EmployeeDashboard />
           </ProtectedRoute>
         }
