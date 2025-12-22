@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Ticket,
@@ -11,11 +11,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Bell,
-  Search,
+  CopyrightIcon
 } from "lucide-react";
 
 export default function Sidebar({ role }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const location = useLocation();
 
   const adminNavItems = [
     { icon: LayoutDashboard, label: "Dashboard", to: "/admin" },
@@ -66,20 +67,26 @@ export default function Sidebar({ role }) {
 
       {/* Main Nav */}
       <nav className="flex-1 p-2 space-y-1">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded hover:bg-gray-100 ${
+        {navItems.map((item) => {
+          // Determine if the link should match exactly (for Dashboard)
+          const exactMatch = item.label === "Dashboard";
+          const isActive = exactMatch
+            ? location.pathname === item.to
+            : location.pathname.startsWith(item.to);
+
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={`flex items-center gap-3 p-2 rounded hover:bg-gray-100 ${
                 isActive ? "bg-blue-100 text-blue-600" : ""
-              } ${isCollapsed ? "justify-center" : ""}`
-            }
-          >
-            <item.icon className="w-5 h-5" />
-            {!isCollapsed && <span>{item.label}</span>}
-          </NavLink>
-        ))}
+              } ${isCollapsed ? "justify-center" : ""}`}
+            >
+              <item.icon className="w-5 h-5" />
+              {!isCollapsed && <span>{item.label}</span>}
+            </NavLink>
+          );
+        })}
       </nav>
 
       {/* Bottom Nav */}
@@ -88,9 +95,10 @@ export default function Sidebar({ role }) {
           <Bell className="w-5 h-5" />
           {!isCollapsed && <span>Notifications</span>}
         </div>
-        <div className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded cursor-pointer">
-          <Search className="w-5 h-5" />
-          {!isCollapsed && <span>Search</span>}
+
+          <div className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded cursor-pointer">
+          <CopyrightIcon className="w-5 h-5" />
+          {!isCollapsed && <span>All Rights Reserved Talag</span>}
         </div>
       </div>
     </aside>
