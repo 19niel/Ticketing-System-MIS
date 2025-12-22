@@ -21,7 +21,7 @@ export const login = async (req, res) => {
     const user = rows[0];
 
     // DEMO PURPOSE (plain text)
-    if (user.password !== password) {
+    if (user.password_hash !== password) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 

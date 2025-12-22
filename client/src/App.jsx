@@ -1,42 +1,63 @@
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
+
+// Admin Area
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/dashboard/Dashboard";
+import AdminNotifications from "./pages/admin/notifications/Notifications"
+import AdminReports from "./pages/admin/reports/Reports"
+import AdminSettings from "./pages/admin/settings/Settings"
+import AdminTickets from "./pages/admin/tickets/Tickets"
+import AdminUsers from "./pages/admin/users/Users"
+
+
 import TechSupportDashboard from "./pages/techsupport/TechSupportDashboard";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import ProtectedRoute from "./utils/ProtectedRoute";
-import PublicRoute from "./utils/PublicRoute";
+
 
 export default function App() {
   return (
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
+    <Routes>
+      {/* Public */}
+      <Route path="/" element={<LoginPage />} />
 
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+      {/* ADMIN */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRole={1}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="notifications" element={<AdminNotifications />} /> 
+        <Route path="tickets" element={<AdminTickets />} /> 
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="reports" element={<AdminReports />} />
+        <Route path="settings" element={<AdminSettings />} />
+      </Route>
 
-        <Route
-          path="/techsupport"
-          element={
-            <ProtectedRoute>
-              <TechSupportDashboard />
-            </ProtectedRoute>
-          }
-        />
+      {/* TECH SUPPORT */}
+      <Route
+        path="/techsupport"
+        element={
+          <ProtectedRoute allowedRole={2}>
+            <TechSupportDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/employee"
-          element={
-            <ProtectedRoute>
-              <EmployeeDashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      {/* EMPLOYEE */}
+      <Route
+        path="/employee"
+        element={
+          <ProtectedRoute allowedRole={3}>
+            <EmployeeDashboard />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }

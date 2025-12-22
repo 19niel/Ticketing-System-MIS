@@ -1,26 +1,29 @@
-import { Outlet, Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
-const ProtectedRoute = () => {
-  
-    const user = null 
-    return user ? <Outlet/> : <Navigate to="/"/>
-  
+export default function ProtectedRoute({ children, allowedRoles }) {
+  const token = localStorage.getItem("token");
+  const roleId = parseInt(localStorage.getItem("role_id"), 10);
+  const location = useLocation();
+
+  if (!token) {
+    // Not logged in, redirect to login
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  // Check if user's role is allowed
+  if (allowedRoles && !allowedRoles.includes(roleId)) {
+    // Role not allowed, redirect to their dashboard
+    switch (roleId) {
+      case 1:
+        return <Navigate to="/admin" replace />;
+      case 2:
+        return <Navigate to="/techsupport" replace />;
+      case 3:
+        return <Navigate to="/employee" replace />;
+      default:
+        return <Navigate to="/" replace />;
+    }
+  }
+
+  return children;
 }
-
-export default ProtectedRoute
-
-
-
-// import { Navigate } from "react-router-dom";
-
-// export default function ProtectedRoute({ children }) {
-//   const token = localStorage.getItem("token");
-//   const roleId = localStorage.getItem("role_id");
-
-//   // 🔍 TEST LOGS for getting the token and the role ID
-//   // console.log("JWT Token:", token);
-//   console.log("Role ID:", roleId);
-
-//   // Temporary: allow access even if missing (for testing)  
-//   return children;
-// }
