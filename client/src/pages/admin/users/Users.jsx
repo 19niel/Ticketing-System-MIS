@@ -78,7 +78,7 @@
             {/* Search */}
 
             
-            <div className="relative flex-1">
+            <div className="bg-white relative flex-1">
             <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
             <input
                 type="text"
