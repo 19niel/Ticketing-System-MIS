@@ -50,9 +50,9 @@ export default function Notifications() {
         {/* Notifications List */}
         <div className="space-y-3">
           {notifications.map((notification) => (
-            <div
+            <div 
               key={notification.id}
-              className={`border rounded-lg p-4 shadow-sm flex items-start gap-4 ${
+              className={` bg-white border rounded-lg p-4 shadow-sm flex items-start gap-4 ${
                 !notification.read ? "border-blue-300" : "border-gray-200"
               }`}
             >
