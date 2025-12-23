@@ -5,33 +5,7 @@
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
 
-    // TEMP DATA (replace with API later)
-    const users = [
-        {
-        id: 1,
-        name: "Nathaniel Talag",
-        email: "admin@ubix.com.ph",
-        role: "Admin",
-        status: "Active",
-        initials: "NT",
-        },
-        {
-        id: 2,
-        name: "Tech Support",
-        email: "techsupport@ubix.com.ph",
-        role: "Tech Support",
-        status: "Active",
-        initials: "TS",
-        },
-        {
-        id: 3,
-        name: "Akahon Ting",
-        email: "accounting@ubix.com.ph",
-        role: "Employee",
-        status: "Inactive",
-        initials: "AT",
-        },
-    ];
+   
 
     const getRoleColor = (role) => {
         switch (role) {
