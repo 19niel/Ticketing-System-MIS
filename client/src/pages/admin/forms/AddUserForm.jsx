@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+
 
 export default function AddUserForm({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -27,51 +29,28 @@ export default function AddUserForm({ isOpen, onClose, onSuccess }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
 
-    try {
-      const response = await fetch("http://localhost:3000/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+  try {
+    const res = await fetch("http://localhost:3000/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
 
-      const data = await response.json();
+    const data = await res.json();
 
-      if (!response.ok) {
-        setError(data.message || "Failed to add user");
-        setLoading(false);
-        return;
-      }
-
-      // Optional: refresh user list in parent
-      if (onSuccess) onSuccess();
-
-      // Reset form
-      setFormData({
-        employee_id: "",
-        first_name: "",
-        last_name: "",
-        position: "",
-        department_id: "",
-        role_id: "",
-        email: "",
-        password: "",
-        is_active: true,
-      });
-
-      onClose();
-    } catch (err) {
-      console.error("Add user error:", err);
-      setError("Server error. Please try again.");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      toast.error(data.message || "Failed to add user");
+      return;
     }
-  };
+
+    toast.success("User added successfully");
+    onClose();
+  } catch (error) {
+    toast.error("Server error");
+  }
+};
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/30 backdrop-blur-sm">

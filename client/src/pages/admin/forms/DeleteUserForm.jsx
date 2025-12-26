@@ -1,30 +1,31 @@
 import React from "react";
+import { toast } from "sonner";
 
 export default function DeleteUserForm({ isOpen, onClose, user, onDeleted }) {
   if (!isOpen || !user) return null;
 
-  const handleDelete = async () => {
-    try {
-      const res = await fetch(
-        `http://localhost:3000/api/users/${user.id}`,
-        {
-          method: "DELETE",
-        }
-      );
+ const handleDelete = async () => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/users/${user.id}`,
+      { method: "DELETE" }
+    );
 
-      if (!res.ok) {
-        const err = await res.json();
-        alert(err.message || "Failed to delete user");
-        return;
-      }
+    const data = await res.json();
 
-      onDeleted(user.id); // update UI
-      onClose();
-    } catch (error) {
-      console.error("Delete error:", error);
-      alert("Server error");
+    if (!res.ok) {
+      toast.error(data.message || "Failed to delete user");
+      return;
     }
-  };
+
+    toast.success("User deleted");
+    onDeleted(user.id);
+    onClose();
+  } catch (error) {
+    toast.error("Server error");
+  }
+};
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">

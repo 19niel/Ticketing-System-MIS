@@ -1,63 +1,68 @@
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
+
 import LoginPage from "./pages/LoginPage";
 
 // Admin Area
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/dashboard/Dashboard";
-import AdminNotifications from "./pages/admin/notifications/Notifications"
-import AdminReports from "./pages/admin/reports/Reports"
-import AdminSettings from "./pages/admin/settings/Settings"
-import AdminTickets from "./pages/admin/tickets/Tickets"
-import AdminUsers from "./pages/admin/users/Users"
-
+import AdminNotifications from "./pages/admin/notifications/Notifications";
+import AdminReports from "./pages/admin/reports/Reports";
+import AdminSettings from "./pages/admin/settings/Settings";
+import AdminTickets from "./pages/admin/tickets/Tickets";
+import AdminUsers from "./pages/admin/users/Users";
 
 import TechSupportDashboard from "./pages/techsupport/TechSupportDashboard";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import ProtectedRoute from "./utils/ProtectedRoute";
 
-
 export default function App() {
   return (
-    <Routes>
-      {/* Public */}
-      <Route path="/" element={<LoginPage />} />
+    <>
+      {/* ✅ Toaster MUST be outside Routes */}
+      <Toaster richColors position="top-right" />
 
-      {/* ADMIN */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute allowedRole={1}>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        <Route path="notifications" element={<AdminNotifications />} /> 
-        <Route path="tickets" element={<AdminTickets />} /> 
-        <Route path="users" element={<AdminUsers />} />
-        <Route path="reports" element={<AdminReports />} />
-        <Route path="settings" element={<AdminSettings />} />
-      </Route>
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<LoginPage />} />
 
-      {/* TECH SUPPORT */}
-      <Route
-        path="/techsupport"
-        element={
-          <ProtectedRoute allowedRole={2}>
-            <TechSupportDashboard />
-          </ProtectedRoute>
-        }
-      />
+        {/* ADMIN */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole={1}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="tickets" element={<AdminTickets />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
 
-      {/* EMPLOYEE */}
-      <Route
-        path="/employee"
-        element={
-          <ProtectedRoute allowedRole={3}>
-            <EmployeeDashboard />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+        {/* TECH SUPPORT */}
+        <Route
+          path="/techsupport"
+          element={
+            <ProtectedRoute allowedRole={2}>
+              <TechSupportDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* EMPLOYEE */}
+        <Route
+          path="/employee"
+          element={
+            <ProtectedRoute allowedRole={3}>
+              <EmployeeDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
