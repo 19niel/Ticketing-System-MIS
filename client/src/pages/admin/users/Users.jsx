@@ -1,12 +1,23 @@
 import { useState, useEffect } from "react";
 import { Search, UserPlus, Edit, Trash2 } from "lucide-react";
 
+import AddUserForm from "../forms/addUserForm";// Import the AddUserForm modal
+import EditUserForm from "../forms/editUserForm";
+import DeleteUserForm from "../forms/DeleteUserForm";
+
 export default function Users() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
-  const [users, setUsers] = useState([]);
 
-  // ✅ Fetch users ONCE
+  const [showModal, setShowModal] = useState(false); // Modal state
+
+  const [users, setUsers] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [selectedUser, setSelectedUser] = useState(null);
+
+
+  // Fetch users ONCE
   useEffect(() => {
     fetch("http://localhost:3000/api/users")
       .then((res) => res.json())
@@ -32,27 +43,27 @@ export default function Users() {
       ? "bg-green-100 text-green-700"
       : "bg-gray-200 text-gray-600";
 
-  // ✅ Filtering logic
+  // Filtering logic
   const filteredUsers = users.filter((user) => {
-  const searchTerm = search.toLowerCase();
+    const searchTerm = search.toLowerCase();
 
-  const searchableText = [
-    user.employee_id,
-    user.name,
-    user.email,
-    user.position,
-    user.department,
-    user.role,
-    user.is_active ? "active" : "inactive",
-  ]
-    .join(" ")
-    .toLowerCase();
+    const searchableText = [
+      user.employee_id,
+      user.name,
+      user.email,
+      user.position,
+      user.department,
+      user.role,
+      user.is_active ? "active" : "inactive",
+    ]
+      .join(" ")
+      .toLowerCase();
 
-  const matchesSearch = searchableText.includes(searchTerm);
-  const matchesRole = roleFilter === "all" || user.role === roleFilter;
+    const matchesSearch = searchableText.includes(searchTerm);
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
 
-  return matchesSearch && matchesRole;
-});
+    return matchesSearch && matchesRole;
+  });
 
   return (
     <div className="p-8 space-y-6">
@@ -64,7 +75,10 @@ export default function Users() {
             Manage user accounts and permissions
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={() => setShowModal(true)} // Open modal
+        >
           <UserPlus className="w-4 h-4" />
           Add User
         </button>
@@ -77,7 +91,7 @@ export default function Users() {
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Search by name, email, or more..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
@@ -115,30 +129,12 @@ export default function Users() {
 
           <tbody>
             {filteredUsers.map((user) => (
-              <tr
-                key={user.id}
-                className="border-t hover:bg-gray-50"
-              >
-                <td className="px-6 py-4 font-mono">
-                  {user.employee_id}
-                </td>
-
-                <td className="px-6 py-4 font-medium">
-                  {user.name}
-                </td>
-
-                <td className="px-6 py-4 text-gray-600">
-                  {user.email}
-                </td>
-
-                <td className="px-6 py-4">
-                  {user.position}
-                </td>
-
-                <td className="px-6 py-4">
-                  {user.department}
-                </td>
-
+              <tr key={user.id} className="border-t hover:bg-gray-50">
+                <td className="px-6 py-4 font-mono">{user.employee_id}</td>
+                <td className="px-6 py-4 font-medium">{user.name}</td>
+                <td className="px-6 py-4 text-gray-600">{user.email}</td>
+                <td className="px-6 py-4">{user.position}</td>
+                <td className="px-6 py-4">{user.department}</td>
                 <td className="px-6 py-4">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleColor(
@@ -148,7 +144,6 @@ export default function Users() {
                     {user.role}
                   </span>
                 </td>
-
                 <td className="px-6 py-4">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(
@@ -158,24 +153,30 @@ export default function Users() {
                     {user.is_active ? "Active" : "Inactive"}
                   </span>
                 </td>
-
                 <td className="px-6 py-4 text-right space-x-1">
-                  <button className="p-2 border rounded hover:bg-gray-100">
-                    <Edit className="w-4 h-4" />
+                  <button
+                  className="p-2 border rounded hover:bg-gray-100"
+                  onClick={() => setEditingUser(user)}
+                  >
+                  <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 border rounded hover:bg-gray-100 text-red-600">
+                    <button
+                    className="p-2 border rounded hover:bg-gray-100 text-red-600"
+                    onClick={() => {
+                        setSelectedUser(user);
+                        setShowDeleteModal(true);
+                    }}
+                    >
                     <Trash2 className="w-4 h-4" />
-                  </button>
+                    </button>
+
                 </td>
               </tr>
             ))}
 
             {filteredUsers.length === 0 && (
               <tr>
-                <td
-                  colSpan="8"
-                  className="text-center py-8 text-gray-500"
-                >
+                <td colSpan="8" className="text-center py-8 text-gray-500">
                   No users found
                 </td>
               </tr>
@@ -183,6 +184,30 @@ export default function Users() {
           </tbody>
         </table>
       </div>
+
+      {/* Add User Modal */}
+      <AddUserForm isOpen={showModal} onClose={() => setShowModal(false)} />
+      <EditUserForm
+        isOpen={!!editingUser}
+        user={editingUser}
+        onClose={() => setEditingUser(null)}
+        onSuccess={() => {
+            fetch("http://localhost:3000/api/users")
+            .then((res) => res.json())
+            .then((data) => setUsers(data));
+        }}
+        />
+        <DeleteUserForm
+        isOpen={showDeleteModal}
+        user={selectedUser}
+        onClose={() => {
+            setShowDeleteModal(false);
+            setSelectedUser(null);
+        }}
+        onDeleted={(deletedId) =>
+            setUsers((prev) => prev.filter((u) => u.id !== deletedId))
+        }
+        />
     </div>
   );
 }
