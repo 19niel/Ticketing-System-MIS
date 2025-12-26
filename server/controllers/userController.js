@@ -7,11 +7,12 @@ export const getAllUsers = async (req, res) => {
         u.user_id AS id,
         u.employee_id,
         CONCAT(u.first_name, ' ', u.last_name) AS name,
+        u.email,
         u.position,
         d.department_name AS department,
         r.role_name AS role,
-        u.is_active,
-        u.email
+        u.is_active
+        
         FROM users u
         JOIN departments d ON u.department_id = d.department_id
         JOIN roles r ON u.role_id = r.role_id
