@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Search, UserPlus, Edit, Trash2 } from "lucide-react";
 
-import AddUserForm from "../forms/addUserForm";// Import the AddUserForm modal
-import EditUserForm from "../forms/editUserForm";
-import DeleteUserForm from "../forms/DeleteUserForm";
+import AddUserForm from "./forms/AddUserForm";// Import the AddUserForm modal
+import EditUserForm from "./forms/EditUserForm";
+import DeleteUserForm from "./forms/DeleteUserForm";
 
 export default function Users() {
   const [search, setSearch] = useState("");

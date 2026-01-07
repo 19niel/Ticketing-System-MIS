@@ -10,6 +10,7 @@ import AdminNotifications from "./pages/admin/notifications/Notifications";
 import AdminReports from "./pages/admin/reports/Reports";
 import AdminSettings from "./pages/admin/settings/Settings";
 import AdminTickets from "./pages/admin/tickets/Tickets";
+import AdminNewTickets from "./pages/admin/tickets_new/NewTickets"
 import AdminUsers from "./pages/admin/users/Users";
 
 import TechSupportDashboard from "./pages/techsupport/TechSupportDashboard";
@@ -38,6 +39,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="notifications" element={<AdminNotifications />} />
           <Route path="tickets" element={<AdminTickets />} />
+          <Route path="new" element={<AdminNewTickets/>} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="reports" element={<AdminReports />} />
           <Route path="settings" element={<AdminSettings />} />

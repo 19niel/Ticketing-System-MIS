@@ -21,6 +21,7 @@ export default function Sidebar({ role }) {
   const adminNavItems = [
     { icon: LayoutDashboard, label: "Dashboard", to: "/admin" },
     { icon: Ticket, label: "All Tickets", to: "/admin/tickets" },
+    { icon: MessageSquare, label: "New Ticket", to: "/admin/new"}, 
     { icon: Users, label: "Users", to: "/admin/users" },
     { icon: BarChart3, label: "Reports", to: "/admin/reports" },
     { icon: Settings, label: "Settings", to: "/admin/settings" },
@@ -60,7 +61,7 @@ export default function Sidebar({ role }) {
         {!isCollapsed && (
           <span className="font-bold text-sm">Ubix Help Desk</span>
         )}
-        <button onClick={() => setIsCollapsed(!isCollapsed)}>
+        <button onClick={() => setIsCollapsed(!isCollapsed)} className="hover:bg-green-100 rounded cursor-pointer">
           {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
         </button>
       </div>
