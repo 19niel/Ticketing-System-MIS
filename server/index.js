@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 
 import authRouter from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
+
 
 dotenv.config();
 
@@ -15,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use("/auth", authRouter);
 app.use("/api/users", userRoutes);
+app.use("/api/tickets", ticketRoutes);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

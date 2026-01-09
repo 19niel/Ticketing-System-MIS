@@ -3,9 +3,9 @@ import { Send, Paperclip } from "lucide-react";
 
 export default function NewTicket() {
   const [form, setForm] = useState({
-    title: "",
-    category: "",
-    priority: "",
+    subject: "",
+    category_id: "",
+    priority_id: "",
     description: "",
   });
 
@@ -13,10 +13,47 @@ export default function NewTicket() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Ticket submitted:", form);
-    // TODO: POST to backend API
+
+    try {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      const res = await fetch("http://localhost:3000/api/tickets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          subject: form.subject,
+          category_id: form.category_id,
+          priority_id: form.priority_id,
+          description: form.description,
+          created_by: user.user_id, // logged-in user
+          assigned_to: null, // tech support will be assigned later
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to create ticket");
+      }
+
+      alert("Ticket created successfully! Ticket Number: " + data.ticket_number);
+
+      // Reset form
+      setForm({
+        subject: "",
+        category_id: "",
+        priority_id: "",
+        description: "",
+      });
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -24,14 +61,11 @@ export default function NewTicket() {
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Create New Ticket</h1>
-        <p className="text-gray-500">
-          Submit a new support request
-        </p>
+        <p className="text-gray-500">Submit a new support request</p>
       </div>
 
       {/* Card */}
       <div className="bg-white rounded-lg shadow">
-        {/* Card Header */}
         <div className="border-b px-6 py-4">
           <h2 className="text-lg font-semibold">Ticket Details</h2>
           <p className="text-sm text-gray-500">
@@ -39,15 +73,14 @@ export default function NewTicket() {
           </p>
         </div>
 
-        {/* Card Content */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Title */}
+          {/* Subject */}
           <div className="space-y-1">
-            <label className="text-sm font-medium">Title</label>
+            <label className="text-sm font-medium">Subject</label>
             <input
               type="text"
-              name="title"
-              value={form.title}
+              name="subject"
+              value={form.subject}
               onChange={handleChange}
               placeholder="Brief description of your issue"
               className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
@@ -60,35 +93,36 @@ export default function NewTicket() {
             <div className="space-y-1">
               <label className="text-sm font-medium">Category</label>
               <select
-                name="category"
-                value={form.category}
+                name="category_id"
+                value={form.category_id}
                 onChange={handleChange}
                 className="w-full border rounded px-3 py-2 bg-white"
                 required
               >
                 <option value="">Select category</option>
-                <option value="hardware">Hardware</option>
-                <option value="software">Software</option>
-                <option value="network">Network</option>
-                <option value="email">Email</option>
-                <option value="account">Account</option>
-                <option value="other">Other</option>
+                <option value="1">Hardware</option>
+                <option value="2">Software</option>
+                <option value="3">Network</option>
+                <option value="4">Email</option>
+                <option value="5">Other</option>
               </select>
             </div>
 
             <div className="space-y-1">
               <label className="text-sm font-medium">Priority</label>
               <select
-                name="priority"
-                value={form.priority}
+                name="priority_id"
+                value={form.priority_id}
                 onChange={handleChange}
                 className="w-full border rounded px-3 py-2 bg-white"
                 required
               >
                 <option value="">Select priority</option>
-                <option value="low">Low – Can wait</option>
-                <option value="medium">Medium – Normal</option>
-                <option value="high">High – Urgent</option>
+                <option value="1">Low – Can wait</option>
+                <option value="2">Medium – Normal</option>
+                <option value="3">High – Urgent</option>
+                <option value="4">Critical – ASAP</option>
+                <option value="5">Emergency – Urgent</option>
               </select>
             </div>
           </div>
@@ -117,7 +151,6 @@ export default function NewTicket() {
               <p className="text-xs text-gray-400 mt-1">
                 PNG, JPG, PDF up to 10MB
               </p>
-              {/* File input can be added later */}
             </div>
           </div>
 

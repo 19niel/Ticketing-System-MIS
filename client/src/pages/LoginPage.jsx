@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -55,8 +56,20 @@ export default function LoginPage() {
         default:
           alert("Unknown role");
       }
+
+    
+      if (!res.ok) {
+      toast.error(data.message || "Failed to Login");
+      return;
+    }
+
+    toast.success("You are now logged in.");
+
+
+      
     } catch (err) {
-      alert(err.message);
+      toast.error("Server error");
+      console.log(err)
     }
   };
 
