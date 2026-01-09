@@ -153,23 +153,25 @@ const [selectedUser, setSelectedUser] = useState(null);
                     {user.is_active ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-right space-x-1">
-                  <button
-                  className="p-2 border rounded hover:bg-gray-100"
-                  onClick={() => setEditingUser(user)}
-                  >
-                  <Edit className="w-4 h-4" />
-                  </button>
+                <td className="px-6 py-4">
+                  <div className="flex items-center justify-end gap-2">
                     <button
-                    className="p-2 border rounded hover:bg-gray-100 text-red-600"
-                    onClick={() => {
+                      className="p-2 border rounded hover:bg-gray-100 transition-colors"
+                      onClick={() => setEditingUser(user)}
+                    >
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </button>
+                    
+                    <button
+                      className="p-2 border rounded hover:bg-gray-100 text-red-600 transition-colors"
+                      onClick={() => {
                         setSelectedUser(user);
                         setShowDeleteModal(true);
-                    }}
+                      }}
                     >
-                    <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
-
+                  </div>
                 </td>
               </tr>
             ))}

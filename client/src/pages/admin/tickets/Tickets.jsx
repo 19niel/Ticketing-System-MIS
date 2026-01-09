@@ -16,13 +16,13 @@ export default function Tickets() {
         const res = await fetch("http://localhost:3000/api/tickets");
         const data = await res.json();
 
-        // Map IDs to readable names if backend returns raw IDs
+        // Map backend data to readable values
         const mapped = data.map((t) => ({
           ...t,
           category: t.category_name || t.category_id,
           status: t.status_name || t.status_id,
           priority: t.priority_name || t.priority_id,
-          conversations: t.conversations || [], // default empty array
+          conversations: t.conversations || [],
         }));
 
         setTickets(mapped);
@@ -34,19 +34,25 @@ export default function Tickets() {
     fetchTickets();
   }, []);
 
+  // Map priority to badge colors
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {
-      case "high":
-        return "bg-red-100 text-red-700";
-      case "medium":
-        return "bg-yellow-100 text-yellow-700";
       case "low":
         return "bg-green-100 text-green-700";
+      case "medium":
+        return "bg-yellow-100 text-yellow-700";
+      case "high":
+        return "bg-orange-100 text-orange-700";
+      case "critical":
+        return "bg-red-200 text-red-800";
+      case "emergency":
+        return "bg-red-500 text-white";
       default:
         return "bg-gray-100 text-gray-700";
     }
   };
 
+  // Map status to badge colors
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "open":
@@ -54,6 +60,8 @@ export default function Tickets() {
       case "in progress":
       case "in-progress":
         return "bg-yellow-100 text-yellow-700";
+      case "on hold":
+        return "bg-purple-100 text-purple-700";
       case "resolved":
         return "bg-green-100 text-green-700";
       case "closed":
@@ -112,6 +120,7 @@ export default function Tickets() {
             <option value="all">All Status</option>
             <option value="open">Open</option>
             <option value="in progress">In Progress</option>
+            <option value="on hold">On Hold</option>
             <option value="resolved">Resolved</option>
             <option value="closed">Closed</option>
           </select>
@@ -122,9 +131,11 @@ export default function Tickets() {
             className="border rounded px-3 py-2"
           >
             <option value="all">All Priority</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
             <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+            <option value="emergency">Emergency</option>
           </select>
         </div>
       </div>
@@ -138,11 +149,13 @@ export default function Tickets() {
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="text-sm font-mono text-gray-500">{ticket.ticket_number}</span>
                   <h3 className="text-lg font-semibold">{ticket.subject}</h3>
+
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${getPriorityColor(ticket.priority)}`}
                   >
                     {ticket.priority}
                   </span>
+
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(ticket.status)}`}
                   >
@@ -180,7 +193,7 @@ export default function Tickets() {
       {selectedTicket && (
         <ViewTicket
           ticket={selectedTicket}
-          userRole="employee" // update dynamically if you store role in context/localStorage
+          userRole="employee" // dynamically change based on logged-in user
           onClose={() => setSelectedTicket(null)}
         />
       )}
