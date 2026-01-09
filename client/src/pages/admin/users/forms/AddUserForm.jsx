@@ -113,13 +113,12 @@ export default function AddUserForm({ isOpen, onClose, onSuccess }) {
             required
           >
             <option value="">Select Department</option>
-            <option value="1">IT Support</option>
-            <option value="2">Programmer</option>
-            <option value="3">HR</option>
-            <option value="4">Operations</option>
-            <option value="5">Sales</option>
-            <option value="6">Finance</option>
-            <option value="7">Manager</option>
+            <option value="1">MIS</option>
+            <option value="2">HR</option>
+            <option value="3">Sales</option>
+            <option value="4">Finance</option>
+            <option value="5">Manager</option>
+            <option value="6">FSD</option>
           </select>
 
           <select

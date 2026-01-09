@@ -1,16 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Settings, ChevronDown, LogOut, Search } from "lucide-react";
+import { Bell, Settings, ChevronDown, LogOut } from "lucide-react";
 
-export default function Header({
-  role = "admin",
-  username = "Admin User",
-  initials = "AD",
-}) {
+export default function Header({ role = "admin" }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [username, setUsername] = useState("User");
+  const [initials, setInitials] = useState("US");
 
   const basePath = `/${role}`;
+
+  // ✅ Load user info from localStorage
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData && userData.fullName) {
+      setUsername(userData.fullName);
+
+      // Generate initials
+      const names = userData.fullName.split(" ");
+      const firstInitial = names[0]?.[0] || "U";
+      const lastInitial = names[1]?.[0] || "S";
+      setInitials((firstInitial + lastInitial).toUpperCase());
+    }
+  }, []);
 
   return (
     <header className="border-b bg-white sticky top-0 z-50">
@@ -22,14 +34,11 @@ export default function Header({
           </div>
           <div>
             <h1 className="text-xl font-bold">UBIX Help Desk System</h1>
-            <p className="text-xs text-gray-500 capitalize">
-              {role} Dashboard
-            </p>
+            <p className="text-xs text-gray-500 capitalize">{role} Dashboard</p>
           </div>
         </div>
 
         {/* Right */}
-
         <div className="flex items-center gap-3 relative">
           {/* Notifications */}
           <button
@@ -38,8 +47,6 @@ export default function Header({
           >
             <Bell className="w-5 h-5" />
           </button>
-
-        
 
           {/* Settings */}
           <button
@@ -64,9 +71,7 @@ export default function Header({
 
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-50">
-                <div className="px-4 py-2 text-gray-500 font-semibold">
-                  My Account
-                </div>
+                <div className="px-4 py-2 text-gray-500 font-semibold">My Account</div>
                 <hr className="border-gray-200" />
 
                 <button
@@ -96,6 +101,7 @@ export default function Header({
                   onClick={() => {
                     localStorage.removeItem("token");
                     localStorage.removeItem("role_id");
+                    localStorage.removeItem("user");
                     setMenuOpen(false);
                     navigate("/", { replace: true });
                   }}

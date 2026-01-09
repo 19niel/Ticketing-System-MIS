@@ -64,7 +64,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">
-          UBIX Help Desk
+          <img src="/img/UBIX_LOGO.png" alt="Company Logo" className="mx-auto w-40 h-40 object-contain" />
+          Help Desk
         </h1>
 
         <form onSubmit={handleLogin} className="space-y-4">
