@@ -39,3 +39,22 @@ export const getAllTickets = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch tickets" });
   }
 };
+
+export const generateTicketNumber = async () => {
+  // 1. Get only the latest ticket
+  const lastTicket = await db.query(
+    "SELECT ticket_id FROM tickets ORDER BY id DESC LIMIT 1"
+  );
+
+  const prefix = "TKT-";
+  let newNumber = 1;
+
+  if (lastTicket.rows.length > 0) {
+    // 2. Extract number from "TNK-0004" -> 4
+    const lastNum = parseInt(lastTicket.rows[0].ticket_id.split('-')[1]);
+    newNumber = lastNum + 1;
+  }
+
+  // 3. Pad with zeros (e.g., 0005)
+  return `${prefix}${newNumber.toString().padStart(4, '0')}`;
+};

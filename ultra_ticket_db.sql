@@ -141,8 +141,8 @@ INSERT INTO `roles` (`role_id`, `role_name`, `created_at`, `updated_at`) VALUES
 CREATE TABLE `tickets` (
   `ticket_id` int(11) NOT NULL,
   `ticket_number` varchar(30) NOT NULL,
-  `created_by` int(11) NOT NULL,
-  `assigned_to` int(11) DEFAULT NULL,
+  `created_by` varchar(11) NOT NULL,
+  `assigned_to` varchar(11) DEFAULT NULL,
   `category_id` int(11) NOT NULL,
   `subject` varchar(255) NOT NULL,
   `description` text NOT NULL,
@@ -158,9 +158,9 @@ CREATE TABLE `tickets` (
 --
 
 INSERT INTO `tickets` (`ticket_id`, `ticket_number`, `created_by`, `assigned_to`, `category_id`, `subject`, `description`, `status_id`, `priority_id`, `closed_at`, `created_at`, `updated_at`) VALUES
-(4, 'TKT-0000004', 3, 2, 1, 'Printer Not Powering On', 'Office printer does not power on after surge.', 1, 3, NULL, '2026-01-09 08:15:53', '2026-01-09 08:15:53'),
-(5, 'TKT-0000005', 4, 2, 2, 'Payroll System Login Error', 'Unable to access payroll system using correct credentials.', 1, 2, NULL, '2026-01-09 08:15:53', '2026-01-09 08:15:53'),
-(6, 'TKT-0000006', 3, 2, 3, 'Network Slow Performance', 'Internet is very slow during office hours.', 2, 2, NULL, '2026-01-09 08:15:53', '2026-01-09 08:15:53');
+(4, 'TKT-0000004', '00000002', '00000001', 1, 'Printer Not Powering On', 'Office printer does not power on after surge.', 1, 3, NULL, '2026-01-09 08:15:53', '2026-01-09 08:15:53'),
+(5, 'TKT-0000005', '00000004', '00000001', 2, 'Payroll System Login Error', 'Unable to access payroll system using correct credentials.', 1, 2, NULL, '2026-01-09 08:15:53', '2026-01-09 08:15:53'),
+(6, 'TKT-0000006', '00000003', '00000001', 3, 'Network Slow Performance', 'Internet is very slow during office hours.', 2, 2, NULL, '2026-01-09 08:15:53', '2026-01-09 08:15:53');
 
 -- --------------------------------------------------------
 
@@ -247,6 +247,7 @@ INSERT INTO `users` (`user_id`, `employee_id`, `first_name`, `last_name`, `posit
 (2, '00000001', 'Tech', 'Support', 'IT Support', 1, 2, 'techsupport@ubix.com.ph', '1234', 1, '2026-01-09 03:58:31', '2026-01-09 03:58:31'),
 (3, '00000002', 'Akahon', 'Ting', 'Accounting', 6, 3, 'accounting@ubix.com.ph', '1234', 1, '2026-01-09 03:58:31', '2026-01-09 03:58:31'),
 (4, '00000003', 'Etch', 'Arr', 'Payroll', 2, 3, 'hr@ubix.com.ph', '1234', 1, '2026-01-09 05:58:36', '2026-01-09 05:58:36');
+(5, '00000004', 'Sey', 'Heyls','Department Manager', 6, 3, 'sales@ubix.com.ph', '1234', 1, '2026-01-09 05:58:36', '2026-01-09 05:58:36');
 
 --
 -- Indexes for dumped tables
