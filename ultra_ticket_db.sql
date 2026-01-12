@@ -246,7 +246,7 @@ INSERT INTO `users` (`user_id`, `employee_id`, `first_name`, `last_name`, `posit
 (1, '02223325', 'Nathaniel', 'Talag', 'Programmer', 1, 1, 'admin@ubix.com.ph', '1234', 1, '2026-01-09 03:58:31', '2026-01-09 03:58:31'),
 (2, '00000001', 'Tech', 'Support', 'IT Support', 1, 2, 'techsupport@ubix.com.ph', '1234', 1, '2026-01-09 03:58:31', '2026-01-09 03:58:31'),
 (3, '00000002', 'Akahon', 'Ting', 'Accounting', 6, 3, 'accounting@ubix.com.ph', '1234', 1, '2026-01-09 03:58:31', '2026-01-09 03:58:31'),
-(4, '00000003', 'Etch', 'Arr', 'Payroll', 2, 3, 'hr@ubix.com.ph', '1234', 1, '2026-01-09 05:58:36', '2026-01-09 05:58:36');
+(4, '00000003', 'Etch', 'Arr', 'Payroll', 2, 3, 'hr@ubix.com.ph', '1234', 1, '2026-01-09 05:58:36', '2026-01-09 05:58:36'),
 (5, '00000004', 'Sey', 'Heyls','Department Manager', 6, 3, 'sales@ubix.com.ph', '1234', 1, '2026-01-09 05:58:36', '2026-01-09 05:58:36');
 
 --

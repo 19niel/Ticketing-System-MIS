@@ -47,6 +47,7 @@ export const login = async (req, res) => {
         first_name: user.first_name,
         last_name: user.last_name,
         role_id: user.role_id,
+        employee_id: user.employee_id,
       },
     });
   } catch (err) {

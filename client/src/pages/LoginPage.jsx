@@ -39,6 +39,7 @@ export default function LoginPage() {
               : data.user.role_id === 2
               ? "techsupport"
               : "employee",
+          employee_id:   `${data.user.employee_id}`
         })
       );
 

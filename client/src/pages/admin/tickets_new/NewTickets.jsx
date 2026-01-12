@@ -23,12 +23,15 @@ export default function NewTicket() {
     setIsSubmitting(true);
 
     // Get current user from localStorage
-    const userData = JSON.parse(localStorage.getItem("user")) || { fullName: "Unknown User" };
+    const userData = JSON.parse(localStorage.getItem("user"));
 
-    // Split fullName to first and last
-    const names = userData.fullName.split(" ");
-    const firstName = names[0] || "Unknown";
-    const lastName = names[1] || "";
+    if (!userData?.employee_id) {
+      toast.error("User session invalid. Please login again.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const employeeId = userData.employee_id;
 
     const ticketNumber = `TKT-${String(Math.floor(Math.random() * 9999999) + 1).padStart(7, "0")}`;
 
@@ -38,7 +41,7 @@ export default function NewTicket() {
       subject: form.subject,
       description: form.description,
       created_at: new Date().toISOString(),
-      created_by: `${firstName} ${lastName}`,
+      created_by: `${employeeId}`,
       assigned_to: null,
       status: "open",
       priority: Number(form.priority_id),
@@ -59,7 +62,7 @@ export default function NewTicket() {
         priority_id: "",
         description: "",
       });
-    }, 1500);
+    }, 1000);
 
 
   
