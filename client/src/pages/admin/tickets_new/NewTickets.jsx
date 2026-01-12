@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Send, Paperclip } from "lucide-react";
-import { toast } from "sonner"; // Assuming you use sonner for notifications
+import { toast } from "sonner";
 
 export default function NewTicket() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [latestTicketNumber, setLatestTicketNumber] = useState("TKT-0000000");
   const [form, setForm] = useState({
     subject: "",
     category_id: "",
@@ -11,72 +12,73 @@ export default function NewTicket() {
     description: "",
   });
 
-  // Update form values
+  // Fetch latest ticket number on mount
+  useEffect(() => {
+    fetch("http://localhost:3000/api/tickets/latest-number")
+      .then((res) => res.json())
+      .then((data) => setLatestTicketNumber(data.latestTicketNumber))
+      .catch((err) => console.error(err));
+  }, []);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Increment ticket number
+  const generateTicketNumber = () => {
+    // latestTicketNumber is like "TKT-0000006"
+    const lastNum = parseInt(latestTicketNumber.split("-")[1], 10);
+    const nextNum = lastNum + 1;
+    return `TKT-${String(nextNum).padStart(7, "0")}`;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Disable the button immediately
     setIsSubmitting(true);
 
-    // Get current user from localStorage
     const userData = JSON.parse(localStorage.getItem("user"));
-
     if (!userData?.employee_id) {
       toast.error("User session invalid. Please login again.");
       setIsSubmitting(false);
       return;
     }
 
-    const employeeId = userData.employee_id;
-
-    const ticketNumber = `TKT-${String(Math.floor(Math.random() * 9999999) + 1).padStart(7, "0")}`;
-
     const ticketPayload = {
       ticket_id: null,
-      ticket_number: ticketNumber,
+      ticket_number: generateTicketNumber(),
       subject: form.subject,
       description: form.description,
       created_at: new Date().toISOString(),
-      created_by: `${employeeId}`,
+      created_by: userData.employee_id,
       assigned_to: null,
-      status: "open",
+      status: 1, // open
       priority: Number(form.priority_id),
       category: Number(form.category_id),
     };
 
     console.log("📝 New Ticket Payload:", ticketPayload);
-    
 
-    // Set a timeout for toast and to re-enable the button after 1.5 seconds
     setTimeout(() => {
       setIsSubmitting(false);
-      toast.success("Ticket submitted successfully!");
-
-        setForm({
+      toast.success("Ticket ready in console!");
+      setForm({
         subject: "",
         category_id: "",
         priority_id: "",
         description: "",
       });
+      // Update latest ticket number in state so next submission increments properly
+      setLatestTicketNumber(ticketPayload.ticket_number);
     }, 1000);
-
-
-  
   };
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
-      {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Create New Ticket</h1>
         <p className="text-gray-500">Submit a new support request</p>
       </div>
 
-      {/* Card */}
       <div className="bg-white rounded-lg shadow">
         <div className="border-b px-6 py-4">
           <h2 className="text-lg font-semibold">Ticket Details</h2>
@@ -86,7 +88,6 @@ export default function NewTicket() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Subject */}
           <div className="space-y-1">
             <label className="text-sm font-medium">Subject</label>
             <input
@@ -100,7 +101,6 @@ export default function NewTicket() {
             />
           </div>
 
-          {/* Category & Priority */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-sm font-medium">Category</label>
@@ -133,13 +133,10 @@ export default function NewTicket() {
                 <option value="1">Low – Can wait</option>
                 <option value="2">Medium – Normal</option>
                 <option value="3">High – Urgent</option>
-                <option value="4">Critical – ASAP</option>
-                <option value="5">Emergency – Urgent</option>
               </select>
             </div>
           </div>
 
-          {/* Description */}
           <div className="space-y-1">
             <label className="text-sm font-medium">Description</label>
             <textarea
@@ -152,7 +149,6 @@ export default function NewTicket() {
             />
           </div>
 
-          {/* Attachments */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Attachments</label>
             <div className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition">
@@ -166,14 +162,13 @@ export default function NewTicket() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
               disabled={isSubmitting}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded transition-all ${
-                isSubmitting 
-                  ? "bg-gray-400 cursor-not-allowed text-white" 
+                isSubmitting
+                  ? "bg-gray-400 cursor-not-allowed text-white"
                   : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
