@@ -21,7 +21,7 @@ export default function App() {
   return (
     <>
       {/* ✅ Toaster MUST be outside Routes */}
-      <Toaster richColors position="top-right" />
+      <Toaster richColors position="top-center" />
 
       <Routes>
         {/* Public */}

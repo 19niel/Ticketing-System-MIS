@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Send, Paperclip } from "lucide-react";
+import { toast } from "sonner"; // Assuming you use sonner for notifications
 
 export default function NewTicket() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     subject: "",
     category_id: "",
@@ -9,51 +11,58 @@ export default function NewTicket() {
     description: "",
   });
 
+  // Update form values
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      const token = localStorage.getItem("token");
-      const user = JSON.parse(localStorage.getItem("user"));
+    // Disable the button immediately
+    setIsSubmitting(true);
 
-      const res = await fetch("http://localhost:3000/api/tickets", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          subject: form.subject,
-          category_id: form.category_id,
-          priority_id: form.priority_id,
-          description: form.description,
-          created_by: user.user_id, // logged-in user
-          assigned_to: null, // tech support will be assigned later
-        }),
-      });
+    // Get current user from localStorage
+    const userData = JSON.parse(localStorage.getItem("user")) || { fullName: "Unknown User" };
 
-      const data = await res.json();
+    // Split fullName to first and last
+    const names = userData.fullName.split(" ");
+    const firstName = names[0] || "Unknown";
+    const lastName = names[1] || "";
 
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to create ticket");
-      }
+    const ticketNumber = `TKT-${String(Math.floor(Math.random() * 9999999) + 1).padStart(7, "0")}`;
 
-      alert("Ticket created successfully! Ticket Number: " + data.ticket_number);
+    const ticketPayload = {
+      ticket_id: null,
+      ticket_number: ticketNumber,
+      subject: form.subject,
+      description: form.description,
+      created_at: new Date().toISOString(),
+      created_by: `${firstName} ${lastName}`,
+      assigned_to: null,
+      status: "open",
+      priority: Number(form.priority_id),
+      category: Number(form.category_id),
+    };
 
-      // Reset form
-      setForm({
+    console.log("📝 New Ticket Payload:", ticketPayload);
+    
+
+    // Set a timeout for toast and to re-enable the button after 1.5 seconds
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success("Ticket submitted successfully!");
+
+        setForm({
         subject: "",
         category_id: "",
         priority_id: "",
         description: "",
       });
-    } catch (err) {
-      alert(err.message);
-    }
+    }, 1500);
+
+
+  
   };
 
   return (
@@ -158,15 +167,21 @@ export default function NewTicket() {
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              disabled={isSubmitting}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded transition-all ${
+                isSubmitting 
+                  ? "bg-gray-400 cursor-not-allowed text-white" 
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
             >
               <Send className="w-4 h-4" />
-              Submit Ticket
+              {isSubmitting ? "Submitting..." : "Submit Ticket"}
             </button>
 
             <button
               type="button"
-              className="px-4 py-2 border rounded hover:bg-gray-100"
+              disabled={isSubmitting}
+              className="px-4 py-2 border rounded hover:bg-gray-100 disabled:opacity-50"
             >
               Cancel
             </button>
