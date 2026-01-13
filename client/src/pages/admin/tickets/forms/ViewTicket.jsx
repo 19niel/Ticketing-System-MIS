@@ -1,42 +1,12 @@
 import { useState } from "react";
-import { X, Send, Clock, User, Tag } from "lucide-react";
+import { X, Send, Clock, CalendarClock, User, UserCog, Tag } from "lucide-react";
+import { STATUS_MAP, PRIORITY_MAP, CATEGORY_MAP, STATUS_COLOR, PRIORITY_COLOR } from "../mapping"
 
 export default function ViewTicket({ ticket, onClose, userRole }) {
   const [newMessage, setNewMessage] = useState("");
   const [ticketStatus, setTicketStatus] = useState(ticket.status);
   const [conversations, setConversations] = useState(ticket.conversations || []);
-
-  const getPriorityColor = (priority) => {
-    switch (priority?.toLowerCase()) {
-      case "high":
-        return "bg-red-100 text-red-700";
-      case "medium":
-        return "bg-yellow-100 text-yellow-700";
-      case "low":
-        return "bg-green-100 text-green-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "open":
-        return "bg-blue-100 text-blue-700";
-      case "in-progress":
-        return "bg-yellow-100 text-yellow-700";
-      case "resolved":
-        return "bg-green-100 text-green-700";
-      case "closed":
-        return "bg-gray-100 text-gray-700";
-      case "failed":
-        return "bg-red-100 text-red-700";
-      case "on-hold":
-        return "bg-purple-100 text-purple-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
+  const [editingStatus, setEditingStatus] = useState(false); // tracks if user is changing status
 
   const getInitials = (name) =>
     name
@@ -54,22 +24,46 @@ export default function ViewTicket({ ticket, onClose, userRole }) {
     });
 
   const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      const newMsg = {
-        id: Date.now(),
-        sender: "You",
-        senderRole: userRole,
-        message: newMessage,
-        timestamp: new Date(),
-        isInternal: false,
-      };
-      setConversations([...conversations, newMsg]);
-      setNewMessage("");
-    }
+    if (!newMessage.trim()) return;
+    const newMsg = {
+      id: Date.now(),
+      sender: "You",
+      senderRole: userRole,
+      message: newMessage,
+      timestamp: new Date(),
+      isInternal: false,
+    };
+    setConversations([...conversations, newMsg]);
+    setNewMessage("");
   };
 
   const handleStatusChange = (e) => {
     setTicketStatus(e.target.value);
+  };
+
+  const handleStatusButtonClick = async () => {
+    if (editingStatus) {
+      // Save status to backend
+      try {
+        const res = await fetch(`http://localhost:3000/api/tickets/${ticket.ticket_id}/status`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: ticketStatus }),
+        });
+
+        if (!res.ok) throw new Error("Failed to update status");
+
+        const updatedTicket = await res.json();
+        setTicketStatus(updatedTicket.status);
+        alert(`Ticket status updated to ${STATUS_MAP[updatedTicket.status] || updatedTicket.status}`);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to update ticket status");
+      }
+    }
+
+    // Toggle edit mode
+    setEditingStatus(!editingStatus);
   };
 
   const canChangeStatus = userRole === "admin" || userRole === "employee";
@@ -82,40 +76,66 @@ export default function ViewTicket({ ticket, onClose, userRole }) {
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-3 flex-wrap">
               <span className="font-mono text-sm text-gray-500">{ticket.ticket_number}</span>
-              <span className={`px-2 py-1 rounded text-xs font-semibold capitalize ${getPriorityColor(ticket.priority)}`}>
-                {ticket.priority}
+              <span
+                className={`px-2 py-1 rounded text-xs font-semibold capitalize ${PRIORITY_COLOR[ticket.priority?.toLowerCase()]}`}
+              >
+                {PRIORITY_MAP[ticket.priority?.toLowerCase()] || ticket.priority}
               </span>
-              <span className={`px-2 py-1 rounded text-xs font-semibold capitalize ${getStatusColor(ticketStatus)}`}>
-                {ticketStatus}
+              <span
+                className={`px-2 py-1 rounded text-xs font-semibold capitalize ${STATUS_COLOR[ticketStatus?.toLowerCase()]}`}
+              >
+                {STATUS_MAP[ticketStatus?.toLowerCase()] || ticketStatus}
               </span>
             </div>
             <h2 className="text-2xl font-bold">{ticket.subject}</h2>
+            <h3 className="text-l">{ticket.description}</h3>
             <div className="flex items-center gap-6 text-sm text-gray-500 flex-wrap">
               <span className="flex items-center gap-2"><User className="h-4 w-4" /> {ticket.created_by}</span>
-              <span className="flex items-center gap-2"><Tag className="h-4 w-4" /> {ticket.category}</span>
+              <span className="flex items-center gap-2"><UserCog className="h-4 w-4" /> {ticket.assigned_to || "No Assigned Yet"}</span>
+              <span className="flex items-center gap-2"><Tag className="h-4 w-4" /> {CATEGORY_MAP[ticket.category?.toLowerCase()] || ticket.category}</span>
               <span className="flex items-center gap-2"><Clock className="h-4 w-4" /> {formatTimestamp(ticket.created_at)}</span>
+              <span className="flex items-center gap-2"><CalendarClock className="h-4 w-4" /> {ticket.close_at ? formatTimestamp(ticket.close_at) : "Not Closed Yet"}</span>
             </div>
-            {canChangeStatus && (
-              <div className="pt-2">
-                <select
-                  value={ticketStatus}
-                  onChange={handleStatusChange}
-                  className="border rounded px-2 py-1"
-                >
-                  <option value="open">Open</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="on-hold">On Hold</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="closed">Closed</option>
-                  <option value="failed">Failed</option>
-                </select>
-              </div>
-            )}
+
+            {/* Status Edit Section */}
+              {canChangeStatus && (
+                <div className="pt-2 flex items-center gap-2">
+                  <select
+                    value={ticketStatus}
+                    onChange={handleStatusChange}
+                    disabled={!editingStatus}
+                    className={`
+                      px-2 py-1 text-sm rounded
+                      ${editingStatus
+                        ? "border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300 cursor-pointer"
+                        : "border-none bg-transparent appearance-none cursor-default pointer-events-none"
+                      }
+                    `}
+                  >
+                    <option value="open">Open</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="on-hold">On Hold</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                    <option value="failed">Failed</option>
+                  </select>
+
+                  <button
+                    onClick={handleStatusButtonClick}
+                    className={`px-3 py-1 rounded text-white text-sm
+                      ${editingStatus
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-blue-600 hover:bg-blue-700"
+                      }
+                    `}
+                  >
+                    {editingStatus ? "Save Status" : "Change Status"}
+                  </button>
+                </div>
+              )}
           </div>
-          <button
-            className="p-2 hover:bg-gray-100 rounded"
-            onClick={onClose}
-          >
+
+          <button className="p-2 hover:bg-gray-100 rounded" onClick={onClose}>
             <X className="h-5 w-5" />
           </button>
         </div>

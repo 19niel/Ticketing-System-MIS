@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Eye } from "lucide-react";
 import ViewTicket from "./forms/ViewTicket";
+import { STATUS_MAP, PRIORITY_MAP, CATEGORY_MAP, STATUS_COLOR, PRIORITY_COLOR } from "./mapping";
 
 export default function Tickets() {
   const [tickets, setTickets] = useState([]);
@@ -19,12 +20,12 @@ export default function Tickets() {
         // Map backend data to readable values
         const mapped = data.map((t) => ({
           ...t,
-          category: t.category_name || t.category_id,
-          status: t.status_name || t.status_id,
-          priority: t.priority_name || t.priority_id,
+          category: t.category ,
+          status: t.status ,
+          priority: t.priority,
           conversations: t.conversations || [],
         }));
-
+        
         setTickets(mapped);
       } catch (err) {
         console.error("Failed to fetch tickets", err);
@@ -33,43 +34,6 @@ export default function Tickets() {
 
     fetchTickets();
   }, []);
-
-  // Map priority to badge colors
-  const getPriorityColor = (priority) => {
-    switch (priority?.toLowerCase()) {
-      case "low":
-        return "bg-green-100 text-green-700";
-      case "medium":
-        return "bg-yellow-100 text-yellow-700";
-      case "high":
-        return "bg-orange-100 text-orange-700";
-      case "critical":
-        return "bg-red-200 text-red-800";
-      case "emergency":
-        return "bg-red-500 text-white";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
-
-  // Map status to badge colors
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "open":
-        return "bg-blue-100 text-blue-700";
-      case "in progress":
-      case "in-progress":
-        return "bg-yellow-100 text-yellow-700";
-      case "on hold":
-        return "bg-purple-100 text-purple-700";
-      case "resolved":
-        return "bg-green-100 text-green-700";
-      case "closed":
-        return "bg-gray-100 text-gray-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
 
   // Filter tickets
   const filteredTickets = tickets.filter((ticket) => {
@@ -151,24 +115,22 @@ export default function Tickets() {
                   <h3 className="text-lg font-semibold">{ticket.subject}</h3>
 
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getPriorityColor(ticket.priority)}`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${PRIORITY_COLOR[ticket.priority?.toLowerCase()]}`}
                   >
-                    {ticket.priority}
+                    {PRIORITY_MAP[ticket.priority?.toLowerCase()] || ticket.priority}
                   </span>
 
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(ticket.status)}`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLOR[ticket.status?.toLowerCase()]}`}
                   >
-                    {ticket.status}
+                    {STATUS_MAP[ticket.status?.toLowerCase()] || ticket.status}
                   </span>
                 </div>
-
-                <p className="text-gray-600">{ticket.description}</p>
 
                 <div className="flex flex-wrap gap-6 text-sm text-gray-500">
                   <span>Created by: {ticket.created_by}</span>
                   <span>Category: {ticket.category}</span>
-                  {ticket.assigned_to && <span>Assigned to: {ticket.assigned_to}</span>}
+                  <span>Assigned to: {ticket.assigned_to ?? "No Assigned yet"}</span>
                 </div>
               </div>
 

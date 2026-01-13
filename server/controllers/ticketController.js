@@ -8,7 +8,7 @@ export const getAllTickets = async (req, res) => {
         t.ticket_number,
         t.subject,
         t.description,
-        t.created_at,
+     
 
         -- creator
         CONCAT(creator.first_name, ' ', creator.last_name) AS created_by,
@@ -21,11 +21,14 @@ export const getAllTickets = async (req, res) => {
         p.priority_name AS priority,
 
         -- category (optional readable)
-        c.category_name AS category
+        c.category_name AS category,
+        t.closed_at,
+        t.created_at,
+        t.updated_at
 
       FROM tickets t
-      LEFT JOIN users creator ON t.created_by = creator.user_id
-      LEFT JOIN users assignee ON t.assigned_to = assignee.user_id
+      LEFT JOIN users creator ON t.created_by = creator.employee_id
+      LEFT JOIN users assignee ON t.assigned_to = assignee.employee_id
       LEFT JOIN ticket_status s ON t.status_id = s.status_id
       LEFT JOIN priorities p ON t.priority_id = p.priority_id
       LEFT JOIN categories c ON t.category_id = c.category_id
@@ -110,3 +113,5 @@ export const createTicket = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
