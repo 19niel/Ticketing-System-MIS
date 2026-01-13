@@ -32,11 +32,13 @@ export default function NewTicket() {
     return `TKT-${String(nextNum).padStart(7, "0")}`;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
+  try {
     const userData = JSON.parse(localStorage.getItem("user"));
+
     if (!userData?.employee_id) {
       toast.error("User session invalid. Please login again.");
       setIsSubmitting(false);
@@ -44,33 +46,54 @@ export default function NewTicket() {
     }
 
     const ticketPayload = {
-      ticket_id: null,
       ticket_number: generateTicketNumber(),
       subject: form.subject,
       description: form.description,
       created_at: new Date().toISOString(),
       created_by: userData.employee_id,
       assigned_to: null,
-      status: 1, // open
-      priority: Number(form.priority_id),
-      category: Number(form.category_id),
+      status_id: 1, // open
+      priority_id: Number(form.priority_id),
+      category_id: Number(form.category_id),
+      closed_at: null,
     };
 
     console.log("📝 New Ticket Payload:", ticketPayload);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success("Ticket ready in console!");
-      setForm({
-        subject: "",
-        category_id: "",
-        priority_id: "",
-        description: "",
-      });
-      // Update latest ticket number in state so next submission increments properly
-      setLatestTicketNumber(ticketPayload.ticket_number);
-    }, 1000);
-  };
+    const res = await fetch("http://localhost:3000/api/tickets", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ticketPayload),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to create ticket");
+    }
+
+    const data = await res.json();
+
+    toast.success(`Ticket ${data.ticket_number} created successfully 🎉`);
+
+    // Reset form
+    setForm({
+      subject: "",
+      category_id: "",
+      priority_id: "",
+      description: "",
+    });
+
+    // Update latest ticket number so next ticket increments correctly
+    setLatestTicketNumber(data.ticket_number);
+  } catch (err) {
+    console.error("Ticket creation failed:", err);
+    toast.error(err.message || "Something went wrong");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">

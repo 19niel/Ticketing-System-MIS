@@ -55,3 +55,58 @@ export const getLatestTicketNumber = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+export const createTicket = async (req, res) => {
+  try {
+    const {
+      ticket_number,
+      subject,
+      description,
+      created_by,
+      assigned_to,
+      status_id,
+      priority_id,
+      category_id,
+      closed_at_id,
+    } = req.body;
+
+    const sql = `
+      INSERT INTO tickets (
+        ticket_number,
+        subject,
+        description,
+        created_by,
+        assigned_to,
+        status_id,
+        priority_id,
+        category_id,
+        closed_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      ticket_number,
+      subject,
+      description,
+      created_by,
+      assigned_to,
+      status_id,     // 👈 mapped to status_id
+      priority_id,   // 👈 mapped to priority_id
+      category_id,   // 👈 mapped to category_id
+      closed_at_id,
+    ];
+
+    const [result] = await db.query(sql, values);
+
+    res.status(201).json({
+      message: "Ticket created successfully",
+      ticket_id: result.insertId,
+      ticket_number,
+    });
+  } catch (err) {
+    console.error("Create ticket error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
