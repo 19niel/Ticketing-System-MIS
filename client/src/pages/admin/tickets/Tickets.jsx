@@ -137,7 +137,7 @@ export default function Tickets() {
               {/* View Button */}
               <button
                 onClick={() => setSelectedTicket(ticket)}
-                className="flex items-center gap-2 border px-3 py-2 rounded hover:bg-gray-100"
+                className="flex items-center gap-2  px-3 py-2 rounded hover:bg-gray-100"
               >
                 <Eye className="w-4 h-4" />
                 View

@@ -3,6 +3,7 @@ import {
     getAllTickets, 
     getLatestTicketNumber, 
     createTicket, 
+    changeTicketStatus,
 
     
 
@@ -14,6 +15,7 @@ router.get("/", getAllTickets);
 router.get("/latest-number", getLatestTicketNumber);
 router.post("/", createTicket);
 
-
+// 👇 STATUS UPDATE
+router.patch("/:ticket_id/status", changeTicketStatus);
 
 export default router;

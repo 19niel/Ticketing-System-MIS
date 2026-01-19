@@ -115,3 +115,37 @@ export const createTicket = async (req, res) => {
 };
 
 
+export const changeTicketStatus = async (req, res) => {
+  try {
+    const { ticket_id } = req.params;
+    const { status_id } = req.body;
+
+    // Optional: auto-close ticket if status is "Closed"
+    const closedAt =
+      Number(status_id) === 3 ? new Date() : null; // adjust 3 to your CLOSED status_id
+
+    const sql = `
+      UPDATE tickets
+      SET
+        status_id = ?,
+        closed_at = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE ticket_id = ?
+    `;
+
+    const [result] = await db.query(sql, [
+      status_id,
+      closedAt,
+      ticket_id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    res.json({ message: "Ticket status updated successfully" });
+  } catch (err) {
+    console.error("Change status error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
