@@ -1,13 +1,35 @@
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 export default function PublicRoute({ children }) {
-  const token = localStorage.getItem("token");
+  const [userRole, setUserRole] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  if (token) {
-    // User is logged in, redirect to dashboard
-    const role_id = parseInt(localStorage.getItem("role_id"), 10);
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/auth/me", {
+          credentials: "include",
+        });
+        if (!res.ok) {
+          setUserRole(null);
+        } else {
+          const data = await res.json();
+          setUserRole(data.user.role_id);
+        }
+      } catch (err) {
+        setUserRole(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
-    switch (role_id) {
+  if (loading) return null;
+
+  if (userRole) {
+    switch (userRole) {
       case 1:
         return <Navigate to="/admin" replace />;
       case 2:

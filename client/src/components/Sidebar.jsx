@@ -57,7 +57,7 @@ export default function Sidebar({ role }) {
       }`}
     >
       {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between">
+      <div className="p-4  border-b flex items-center justify-between">
         {!isCollapsed && (
           <span className="font-bold text-sm">Ubix Help Desk</span>
         )}

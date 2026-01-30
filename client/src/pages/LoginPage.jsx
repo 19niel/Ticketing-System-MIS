@@ -15,20 +15,18 @@ export default function LoginPage() {
       const res = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // ✅ IMPORTANT: allow cookies
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Invalid credentials");
+        toast.error(data.message || "Failed to login");
+        return;
       }
 
-      // ✅ Save auth data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role_id", data.user.role_id);
-
-      // ✅ Save user info for Header.jsx
+      // ✅ STORE ONLY NON-SENSITIVE USER INFO (UI PURPOSES)
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -39,11 +37,14 @@ export default function LoginPage() {
               : data.user.role_id === 2
               ? "techsupport"
               : "employee",
-          employee_id:   `${data.user.employee_id}`
+          role_id: data.user.role_id,
+          employee_id: data.user.employee_id,
         })
       );
 
-      // ✅ Role-based navigation
+      toast.success("You are now logged in.");
+
+      // ✅ ROLE-BASED NAVIGATION
       switch (data.user.role_id) {
         case 1:
           navigate("/admin", { replace: true });
@@ -55,22 +56,11 @@ export default function LoginPage() {
           navigate("/employee", { replace: true });
           break;
         default:
-          alert("Unknown role");
+          toast.error("Unknown role");
       }
-
-    
-      if (!res.ok) {
-      toast.error(data.message || "Failed to Login");
-      return;
-    }
-
-    toast.success("You are now logged in.");
-
-
-      
     } catch (err) {
+      console.error(err);
       toast.error("Server error");
-      console.log(err)
     }
   };
 
@@ -78,7 +68,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">
-          <img src="/img/UBIX_LOGO.png" alt="Company Logo" className="mx-auto w-40 h-40 object-contain" />
+          <img
+            src="/img/UBIX_LOGO.png"
+            alt="Company Logo"
+            className="mx-auto w-40 h-40 object-contain"
+          />
           Help Desk
         </h1>
 

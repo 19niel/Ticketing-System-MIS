@@ -13,8 +13,16 @@ import AdminTickets from "./pages/admin/tickets/Tickets";
 import AdminNewTickets from "./pages/admin/tickets_new/NewTickets"
 import AdminUsers from "./pages/admin/users/Users";
 
+
+// Employee Area
+import EmployeeTickets from "./pages/employee/MyTickets/Tickets"
+import EmployeeNewTickets from "./pages/employee/NewTickets/NewTickets"
+
+
+
+
 import TechSupportDashboard from "./pages/techsupport/TechSupportDashboard";
-import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
+import EmployeeLayout from "./pages/employee/EmployeeLayout.jsx";
 import ProtectedRoute from "./utils/ProtectedRoute";
 
 export default function App() {
@@ -24,8 +32,11 @@ export default function App() {
       <Toaster richColors position="top-center" />
 
       <Routes>
-        {/* Public */}
-        <Route path="/" element={<LoginPage />} />
+        {/* Public */} 
+        
+          <Route path="/" element={<LoginPage />} />
+     
+      
 
         {/* ADMIN */}
         <Route
@@ -60,10 +71,18 @@ export default function App() {
           path="/employee"
           element={
             <ProtectedRoute allowedRole={3}>
-              <EmployeeDashboard />
+              <EmployeeLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="tickets" element={<EmployeeTickets />} />
+          <Route path="new" element={<EmployeeNewTickets />} />
+
+
+        </Route>
+
+             
+
       </Routes>
     </>
   );

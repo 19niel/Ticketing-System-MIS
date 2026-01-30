@@ -20,7 +20,7 @@ export const login = async (req, res) => {
 
     const user = rows[0];
 
-    // DEMO PURPOSE (plain text)
+    // DEMO PURPOSE (plain text password)
     if (user.password_hash !== password) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
@@ -40,8 +40,16 @@ export const login = async (req, res) => {
       { expiresIn: "5h" }
     );
 
+    // ✅ STORE TOKEN IN HTTP-ONLY COOKIE
+    res.cookie("token", token, {
+      httpOnly: true,          // JS cannot access
+      secure: false,           // set true in HTTPS
+      sameSite: "lax",
+      maxAge: 5 * 60 * 60 * 1000, // 5 hours
+    });
+
+    // ✅ RETURN USER ONLY (NO TOKEN IN RESPONSE)
     res.json({
-      token,
       user: {
         user_id: user.user_id,
         first_name: user.first_name,
@@ -53,5 +61,18 @@ export const login = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const me = (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ message: "Not logged in" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return res.json({ user: decoded }); // contains user_id, role_id
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
